@@ -1,18 +1,14 @@
 import { useState } from 'react';
 import { useAPI } from './context';
 
-const defaultState = {
-    error: null,
-    data: undefined,
-    response: undefined,
-    loading: true
-};
+const defaultUpdateStore = (response: any, state: any): any => {
+    return response;
+}
 
-const useMutation = (method: string, url: string): UseAPI.MutationResponse => {
+const useMutation = ([store, setStore]: UseAPI.StateArray, method: string, url: string): UseAPI.MutationResponse => {
     const { base_url } = useAPI();
-    const [state, setState] = useState(defaultState);
 
-    const sendRequest = (body: any, headers?: any) => {
+    const sendRequest = ({body, headers}: {body: any, headers?: any}, updateStore = defaultUpdateStore) => {
         fetch(base_url + url, {
             method,
             headers,
@@ -25,14 +21,14 @@ const useMutation = (method: string, url: string): UseAPI.MutationResponse => {
                 throw new Error("Invalid response");
             })
             .then((response: any) => {
-                setState({ ...state, error: null, data: response.data, response, loading: false });
+                setStore({ ...store, error: null, data: updateStore(response, store.data), response, loading: false });
             })
             .catch(err => {
-                setState({ ...state, error: err.message, loading: false });
+                setStore({ ...store, error: err.message, loading: false });
             });
     }
 
-    return [state, sendRequest];
+    return [store, sendRequest];
 
 }
 

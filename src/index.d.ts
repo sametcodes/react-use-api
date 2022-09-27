@@ -1,4 +1,5 @@
 declare module UseAPI {
+    export type StateArray = [State, React.Dispatch<React.SetStateAction<State>>];
     export interface ResponseData {
         data: any;
         response: any;

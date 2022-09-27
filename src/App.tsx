@@ -1,34 +1,37 @@
 import './App.css';
-import useApi from './hooks/api';
+import useAPI from './hooks/api';
 import Form from './Form';
 
 function App() {
-  const [{ response, data, error, loading, variables }, sendQuery] = useApi.get('/users', { _limit: 20, _page: 1 });
-  const [ lastUser ] = useApi.get('/users', { _limit: 1, _sort: 'id', _order: 'desc' });
-  const [ postResponse, sendMutation ] = useApi.post('/users');
+  const API = useAPI("/users");
+  const [{ loading, error, data, variables, response }, get] = API.get({ _sort: "id", _order: "desc", _limit: 5, _page: 1 });
+  const [mutationResponse, post] = API.post();
 
   const loadMore = () => {
-    sendQuery({ _page: (variables._page || 1) + 1 }, (response: any, state: any) => {
-      return [...state, ...response];
+    get({ ...variables, _page: variables._page + 1 }, (response, store) => {
+      return [...store, ...response];
     });
   }
 
   const onSearch = (event: any) => {
     if (event.keyCode === 13)
-      sendQuery({ q: event.target.value });
+      get({ q: event.target.value })
   }
 
   const getNextPage = (event: any) => {
-    sendQuery({ _page: (variables._page || 1) + 1 });
+    get({ ...variables, _page: variables._page + 1 });
   }
 
   const getPrevPage = (event: any) => {
-    sendQuery({ _page: (variables._page || 1) - 1 });
+    get({ ...variables, _page: variables._page - 1 });
   }
 
   const onSubmit = (values: any) => {
-    const lastId = lastUser.data?.[0].id;
-    sendMutation({id: Number(lastId) + 1, ...values}, { 'Content-type': "application/json" })
+    post({
+      body: values, headers: { "Content-Type": "application/json" }
+    }, (response: any, data: any) => {
+      return [response, ...data];
+    })
   }
 
   return (
@@ -42,7 +45,7 @@ function App() {
         {data.length ?
           <ul>
             {data?.map((user: any) =>
-              <li key={user.id}>{user.name}</li>
+              <li key={user.id}>({user.id}) {user.name}</li>
             )}
           </ul>
           : <p>No results found</p>}

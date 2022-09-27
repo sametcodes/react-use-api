@@ -19,6 +19,7 @@ const Form = ({ onSubmit }: { onSubmit: (values: any[]) => any }): JSX.Element =
         }).reduce((obj, el) => obj.mergeobject(el), {})
 
         onSubmit(values_transformed);
+        (event.target as HTMLFormElement).reset();
     }
 
     return <>
