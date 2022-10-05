@@ -1,6 +1,10 @@
 # react-use-api
 
 > Do not use. This is an experimental package for now.
+
+## Development
+
+The package has been developed on a React project, it's not a standalone package for now. I've been working on finding for the best way to handle renders and hold inner states. If you want to contribute, you need to serve the `users.json` file through [json-server](https://github.com/typicode/json-server), install the dependencies and run the react project.
  
 ## Usage
 
