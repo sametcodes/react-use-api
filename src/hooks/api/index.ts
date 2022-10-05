@@ -6,7 +6,13 @@ import useMutation from './mutation';
 const defaultStore = {
     error: null,
     data: undefined,
-    response: undefined,
+    response: {
+        GET: undefined,
+        POST: undefined,
+        PUT: undefined,
+        PATCH: undefined,
+        DELETE: undefined
+    },
     loading: true,
     variables: {}
 };
@@ -16,10 +22,10 @@ const useAPI = (path: string) => {
 
     return {
         get: (variables: any = {}) => useQuery.bind(this, [store, setStore], path)(variables),
-        post: useMutation.bind(this, [store, setStore], 'POST', path),
-        put: useMutation.bind(this, [store, setStore], 'PUT', path),
-        patch: useMutation.bind(this, [store, setStore], 'PATCH', path),
-        delete: useMutation.bind(this, [store, setStore], 'DELETE', path)
+        post: (customPath?: string) => useMutation.bind(this, [store, setStore], 'POST', customPath || path)(),
+        put: (customPath?: string) => useMutation.bind(this, [store, setStore], 'PUT', customPath || path)(),
+        patch: (customPath?: string) => useMutation.bind(this, [store, setStore], 'PATCH', customPath || path)(),
+        delete: (customPath?: string) => useMutation.bind(this, [store, setStore], 'DELETE', customPath || path)()
     }
 }
 

@@ -1,5 +1,5 @@
-import { useState } from 'react';
 import { useAPI } from './context';
+import { interpolate } from './utils';
 
 const defaultUpdateStore = (response: any, state: any): any => {
     return response;
@@ -8,8 +8,9 @@ const defaultUpdateStore = (response: any, state: any): any => {
 const useMutation = ([store, setStore]: UseAPI.StateArray, method: string, url: string): UseAPI.MutationResponse => {
     const { base_url } = useAPI();
 
-    const sendRequest = ({body, headers}: {body: any, headers?: any}, updateStore = defaultUpdateStore) => {
-        fetch(base_url + url, {
+    const sendRequest = ({body, headers, params}: {body?: any, headers?: any, params?: any}, updateStore = defaultUpdateStore) => {
+        const interpolated_url = interpolate(url, params);
+        fetch(base_url + interpolated_url, {
             method,
             headers,
             body: JSON.stringify(body)
@@ -21,14 +22,14 @@ const useMutation = ([store, setStore]: UseAPI.StateArray, method: string, url: 
                 throw new Error("Invalid response");
             })
             .then((response: any) => {
-                setStore({ ...store, error: null, data: updateStore(response, store.data), response, loading: false });
+                setStore({ ...store, error: null, data: updateStore(response, store.data), response: { ...store.response, [method]: response }, loading: false });
             })
             .catch(err => {
                 setStore({ ...store, error: err.message, loading: false });
             });
     }
 
-    return [store, sendRequest];
+    return [{...store, response: store.response[method]}, sendRequest];
 
 }
 

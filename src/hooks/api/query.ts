@@ -20,10 +20,10 @@ const useQuery = ([store, setStore]: UseAPI.StateArray, path: string, initialVar
                 throw new Error("Invalid response");
             })
             .then((response: any) => {
-                setStore({ ...store, variables, error: null, data: updateStore(response, store.data), response, loading: false });
+                setStore({ ...store, variables, error: null, data: updateStore(response, store.data), response: { GET: response }, loading: false });
             })
             .catch(err => {
-                setStore({ ...store, variables, error: err.message, loading: false });
+                setStore({ ...store, variables, error: err.message, loading: false, response: { GET: undefined } });
             });
     }
 
@@ -35,7 +35,7 @@ const useQuery = ([store, setStore]: UseAPI.StateArray, path: string, initialVar
         }
     }, [])
 
-    return [store, sendRequest];
+    return [{ ...store, response: store.response.GET }, sendRequest];
 }
 
 export default useQuery;
